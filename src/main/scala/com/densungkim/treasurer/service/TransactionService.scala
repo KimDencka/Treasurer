@@ -22,8 +22,7 @@ final class TransactionServiceImpl(
   userRepository: UserRepository,
 )(implicit ec: ExecutionContext)
   extends TransactionService {
-  private val logger     = LoggerFactory.getLogger(getClass.getName)
-  private val ValidTypes = Set("income", "expense")
+  private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private def ensureUserExists(userId: UUID): Future[Unit] =
     userRepository.getById(userId).flatMap {
