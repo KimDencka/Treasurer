@@ -1,6 +1,6 @@
 package com.densungkim.treasurer.repository
 
-import com.densungkim.treasurer.model.user.User
+import com.densungkim.treasurer.model.user.{PasswordHash, User}
 import slick.jdbc.PostgresProfile.api._
 
 import java.time.LocalDateTime
@@ -21,7 +21,10 @@ final class UserRepositoryImpl(db: Database)(implicit ec: ExecutionContext) exte
     def username     = column[String]("username", O.Unique)
     def passwordHash = column[String]("password_hash")
     def createdAt    = column[LocalDateTime]("created_at")
-    def *            = (id, username, passwordHash, createdAt).mapTo[User]
+    def *            = (id, username, passwordHash, createdAt) <> ({ case (id, username, passwordHash, createdAt) =>
+      User(id, username, PasswordHash(passwordHash), createdAt)
+    },
+    (user: User) => Some((user.id, user.username, user.password.value, user.createdAt)))
   }
 
   private val users = TableQuery[UsersTable]

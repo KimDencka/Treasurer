@@ -1,9 +1,9 @@
 package com.densungkim.treasurer.repository
 
-import com.densungkim.treasurer.model.transaction.Transaction
+import com.densungkim.treasurer.model.transaction.{Transaction, TransactionType}
 import slick.jdbc.PostgresProfile.api._
 
-import java.time.Instant
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,13 +18,27 @@ trait TransactionRepository {
 
 final class TransactionRepositoryImpl(db: Database)(implicit ec: ExecutionContext) extends TransactionRepository {
   private class TransactionsTable(tag: Tag) extends Table[Transaction](tag, "transactions") {
-    def id              = column[UUID]("id", O.PrimaryKey)
-    def userId          = column[UUID]("user_id")
-    def amount          = column[BigDecimal]("amount")
-    def description     = column[String]("description")
-    def transactionType = column[String]("type")
-    def createdAt       = column[Instant]("created_at")
-    def *               = (id, userId, amount, description, transactionType, createdAt).mapTo[Transaction]
+    def id          = column[UUID]("id", O.PrimaryKey)
+    def userId      = column[UUID]("user_id")
+    def amount      = column[BigDecimal]("amount")
+    def `type`      = column[String]("type")
+    def description = column[Option[String]]("description")
+    def createdAt   = column[LocalDateTime]("created_at")
+    def *           = (id, userId, amount, `type`, description, createdAt) <> ({
+      case (id, userId, amount, typee, description, createdAt) =>
+        Transaction(id, userId, amount, TransactionType.withName(typee), description, createdAt)
+    },
+    (transaction: Transaction) =>
+      Some(
+        (
+          transaction.id,
+          transaction.userId,
+          transaction.amount,
+          transaction.`type`.entryName,
+          transaction.description,
+          transaction.createdAt,
+        ),
+      ))
   }
 
   private val transactions = TableQuery[TransactionsTable]
@@ -36,9 +50,15 @@ final class TransactionRepositoryImpl(db: Database)(implicit ec: ExecutionContex
     db.run {
       transactions
         .filter(_.id === transaction.id)
-        .map(t => (t.userId, t.amount, t.description, t.transactionType, t.createdAt))
+        .map(t => (t.userId, t.amount, t.`type`, t.description, t.createdAt))
         .update(
-          (transaction.userId, transaction.amount, transaction.description, transaction.`type`, transaction.createdAt),
+          (
+            transaction.userId,
+            transaction.amount,
+            transaction.`type`.entryName,
+            transaction.description,
+            transaction.createdAt,
+          ),
         )
         .map {
           case 0 => None
@@ -53,7 +73,7 @@ final class TransactionRepositoryImpl(db: Database)(implicit ec: ExecutionContex
     db.run(transactions.filter(_.userId === userId).result)
 
   override def getByType(userId: UUID, transactionType: String): Future[Seq[Transaction]] =
-    db.run(transactions.filter(t => t.userId === userId && t.transactionType === transactionType).result)
+    db.run(transactions.filter(t => t.userId === userId && t.`type` === transactionType).result)
 
   override def delete(id: UUID): Future[Boolean] =
     db.run(transactions.filter(_.id === id).delete).map(_ > 0)
