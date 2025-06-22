@@ -10,14 +10,18 @@ import scala.util.{Failure, Try}
 object FlywayMigrator {
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def migrateDatabase(config: PostgresConfig): Try[Unit] = Try {
+  def migrateDatabase(
+    config: PostgresConfig,
+    additionalMigrationLocations: List[String] = List.empty,
+    addDefaultLocation: Boolean = true,
+  ): Try[Unit] = Try {
     logger.info("Starting database migration...")
     val flyway          = Flyway
       .configure()
-      .locations("classpath:db/migration")
+      .locations(
+        (if (addDefaultLocation) List("classpath:db/migration") else Nil) ::: additionalMigrationLocations: _*,
+      )
       .dataSource(config.jdbcUrl, config.user, config.password)
-      .driver(config.driver)
-      .schemas(config.schema)
       .load()
     val migrationResult = flyway.migrate()
     logger.info(s"Applied ${migrationResult.migrationsExecuted} migrations.")
