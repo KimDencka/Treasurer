@@ -5,6 +5,7 @@ object Dependencies {
   private object Versions {
     val akka          = "2.8.8"
     val akkaHttp      = "10.5.3"
+    val akkaCirce     = "1.39.2"
     val bcrypt        = "4.3.0"
     val circe         = "0.14.14"
     val circeRefined  = "0.15.1"
@@ -35,6 +36,7 @@ object Dependencies {
     val akkaSlf4j       = akka("slf4j")
     val akkaHttp        = akka("http", Versions.akkaHttp)
     val akkaHttpTestkit = akka("http-testkit", Versions.akkaHttp) % Test
+    val akkaCirce       = "de.heikoseeberger"                    %% "akka-http-circe" % Versions.akkaCirce
 
     // Cryptography  dependency
     val bcrypt = "com.github.t3hnar" %% "scala-bcrypt" % Versions.bcrypt
@@ -93,6 +95,7 @@ object Dependencies {
     Libraries.akkaStreams,
     Libraries.akkaSlf4j,
     Libraries.akkaHttp,
+    Libraries.akkaCirce,
   )
 
   private val circe: Seq[ModuleID] = Seq(
