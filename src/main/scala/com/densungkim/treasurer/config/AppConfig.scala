@@ -9,12 +9,13 @@ final case class AppConfig(
   http: HttpConfig,
   postgres: PostgresConfig,
   executionContexts: ExecutionContextsConfig,
+  jwt: JwtConfig,
 ) {
 
   /**
    * Returns all credentials. Used to replace credentials with *****.
    */
-  private val credentials: Set[String] = Set(postgres.user, postgres.password)
+  private val credentials: Set[String] = Set(postgres.user, postgres.password, jwt.secret)
 
   override def toString: String = {
     def productToString(product: Product): String = {

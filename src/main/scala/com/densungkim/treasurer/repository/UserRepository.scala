@@ -19,7 +19,7 @@ final class UserRepositoryImpl(db: Database)(implicit ec: ExecutionContext) exte
   private class UsersTable(tag: Tag) extends Table[User](tag, "users") {
     def id           = column[UUID]("id", O.PrimaryKey)
     def username     = column[String]("username", O.Unique)
-    def passwordHash = column[String]("password_hash")
+    def passwordHash = column[String]("password")
     def createdAt    = column[LocalDateTime]("created_at")
     def *            = (id, username, passwordHash, createdAt) <> ({ case (id, username, passwordHash, createdAt) =>
       User(id, username, PasswordHash(passwordHash), createdAt)

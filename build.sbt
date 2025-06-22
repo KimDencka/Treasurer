@@ -7,7 +7,7 @@ ThisBuild / scalaVersion := "2.13.16"
 lazy val root = (project in file("."))
   .settings(
     name := "treasurer",
-//    scalacOptions ++= CompilerOptions.cOptions,
-//    Test / scalacOptions --= Seq("-Xfatal-warnings"),
+    scalacOptions ++= CompilerOptions.cOptions,
+    Test / scalacOptions --= Seq("-Xfatal-warnings"),
     libraryDependencies ++= Dependencies.librariesDependencies,
   )
