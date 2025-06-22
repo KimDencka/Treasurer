@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait AuthService {
   def register(request: UserRequest): Future[UserResponse]
   def login(request: UserRequest): Future[AuthResponse]
-  def validateToken(token: String): Future[Option[UUID]]
+  def validateToken(token: String): Option[UUID]
 }
 
 final class AuthServiceImpl(
@@ -41,6 +41,6 @@ final class AuthServiceImpl(
                  }
     } yield result
 
-  override def validateToken(token: String): Future[Option[UUID]] =
-    Future(JwtUtil.validateToken(token, jwtConfig))
+  override def validateToken(token: String): Option[UUID] =
+    JwtUtil.validateToken(token, jwtConfig)
 }

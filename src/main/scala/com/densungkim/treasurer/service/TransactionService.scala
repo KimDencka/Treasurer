@@ -1,7 +1,7 @@
 package com.densungkim.treasurer.service
 
 import com.densungkim.treasurer.model.ErrorModels.{TransactionNotFound, UserNotFound}
-import com.densungkim.treasurer.model.transaction.{TransactionRequest, TransactionResponse}
+import com.densungkim.treasurer.model.transaction.{TransactionRequest, TransactionResponse, TransactionType}
 import com.densungkim.treasurer.repository.{TransactionRepository, UserRepository}
 import org.slf4j.LoggerFactory
 
@@ -13,7 +13,7 @@ trait TransactionService {
   def update(id: UUID, userId: UUID, request: TransactionRequest): Future[TransactionResponse]
   def getById(id: UUID, userId: UUID): Future[TransactionResponse]
   def getAll(userId: UUID): Future[Seq[TransactionResponse]]
-  def getByType(userId: UUID, transactionType: String): Future[Seq[TransactionResponse]]
+  def getByType(userId: UUID, `type`: TransactionType): Future[Seq[TransactionResponse]]
   def delete(id: UUID, userId: UUID): Future[Unit]
 }
 
@@ -87,10 +87,10 @@ final class TransactionServiceImpl(
       transactions <- repository.getAll(userId)
     } yield transactions.map(_.toResponse)
 
-  override def getByType(userId: UUID, transactionType: String): Future[Seq[TransactionResponse]] =
+  override def getByType(userId: UUID, `type`: TransactionType): Future[Seq[TransactionResponse]] =
     for {
       _            <- ensureUserExists(userId)
-      transactions <- repository.getByType(userId, transactionType)
+      transactions <- repository.getByType(userId, `type`)
     } yield transactions.map(_.toResponse)
 
   override def delete(id: UUID, userId: UUID): Future[Unit] =

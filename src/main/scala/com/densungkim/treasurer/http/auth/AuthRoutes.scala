@@ -8,9 +8,7 @@ import com.densungkim.treasurer.service.AuthService
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 
-import scala.concurrent.ExecutionContext
-
-class AuthRoutes(authService: AuthService)(implicit ec: ExecutionContext) {
+final class AuthRoutes(authService: AuthService) {
   val routes: Route =
     pathPrefix("auth") {
       post {

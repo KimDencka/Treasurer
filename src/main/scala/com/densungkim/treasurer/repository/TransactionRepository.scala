@@ -12,7 +12,7 @@ trait TransactionRepository {
   def update(transaction: Transaction): Future[Option[Transaction]]
   def getById(id: UUID): Future[Option[Transaction]]
   def getAll(userId: UUID): Future[Seq[Transaction]]
-  def getByType(userId: UUID, transactionType: String): Future[Seq[Transaction]]
+  def getByType(userId: UUID, `type`: TransactionType): Future[Seq[Transaction]]
   def delete(id: UUID): Future[Boolean]
 }
 
@@ -72,8 +72,8 @@ final class TransactionRepositoryImpl(db: Database)(implicit ec: ExecutionContex
   override def getAll(userId: UUID): Future[Seq[Transaction]] =
     db.run(transactions.filter(_.userId === userId).result)
 
-  override def getByType(userId: UUID, transactionType: String): Future[Seq[Transaction]] =
-    db.run(transactions.filter(t => t.userId === userId && t.`type` === transactionType).result)
+  override def getByType(userId: UUID, `type`: TransactionType): Future[Seq[Transaction]] =
+    db.run(transactions.filter(t => t.userId === userId && t.`type` === `type`.entryName).result)
 
   override def delete(id: UUID): Future[Boolean] =
     db.run(transactions.filter(_.id === id).delete).map(_ > 0)
