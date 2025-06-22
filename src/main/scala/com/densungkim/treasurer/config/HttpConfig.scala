@@ -7,7 +7,4 @@ import scala.concurrent.duration.FiniteDuration
 final case class HttpConfig(
   host: NonEmptyString,
   port: PosInt,
-  requestTimeout: FiniteDuration,
-  idleTimeout: FiniteDuration,
-  backlog: PosInt,
 )

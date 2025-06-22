@@ -13,8 +13,4 @@ final case class PostgresConfig(
   connections: DbConnectionsCfg,
 )
 
-final case class DbConnectionsCfg(
-  poolSize: PosInt,
-  maxLifetime: PosInt,
-  minimumIdle: PosInt,
-)
+final case class DbConnectionsCfg(poolSize: PosInt)
