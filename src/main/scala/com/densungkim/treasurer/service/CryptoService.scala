@@ -4,20 +4,28 @@ import com.densungkim.treasurer.model.user.PasswordHash
 import com.github.t3hnar.bcrypt._
 import org.slf4j.LoggerFactory
 
-import scala.util.{Failure, Try}
+import scala.concurrent.{ExecutionContext, Future}
 
-final class CryptoService {
-  private val logger = LoggerFactory.getLogger(this.getClass)
+final class CryptoService(implicit ec: ExecutionContext) {
+  private val logger       = LoggerFactory.getLogger(getClass.getName)
+  private val BcryptRounds = 12
 
-  def hashPassword(password: String): Try[PasswordHash] =
-    password.bcryptSafeBounded(12).map(PasswordHash.apply).recoverWith { case e: Exception =>
-      logger.error("Failed to hash password", e)
-      Failure(e)
-    }
+  def hashPassword(password: String): Future[PasswordHash] =
+    Future
+      .fromTry(password.bcryptSafeBounded(BcryptRounds))
+      .map(PasswordHash.apply)
+      .recover { case e: Exception =>
+        logger.error("Failed to hash password", e)
+        throw CryptoException("Failed to hash password", e)
+      }
 
-  def isValid(password: String, passwordHash: PasswordHash): Try[Boolean] =
-    password.isBcryptedSafeBounded(passwordHash.value).recoverWith { case e: Exception =>
-      logger.error("Failed to validate password", e)
-      Failure(e)
-    }
+  def isValid(password: String, passwordHash: PasswordHash): Future[Boolean] =
+    Future
+      .fromTry(password.isBcryptedSafeBounded(passwordHash.value))
+      .recover { case e: Exception =>
+        logger.error("Failed to validate password", e)
+        throw CryptoException("Failed to validate password", e)
+      }
 }
+
+case class CryptoException(message: String, cause: Throwable) extends RuntimeException(message, cause)
