@@ -10,7 +10,6 @@ object Dependencies {
     val circeRefined  = "0.15.1"
     val circeExtras   = "0.14.4"
     val chimney       = "1.8.1"
-    val doobie        = "1.0.0-RC9"
     val enumeratum    = "1.9.0"
     val flyway        = "11.9.2"
     val jwt           = "11.0.0"
@@ -22,6 +21,8 @@ object Dependencies {
     val scalatest     = "3.2.19"
     val scalatestPlus = "3.2.19.0"
     val slf4j         = "2.0.17"
+    val slick         = "3.6.1"
+    val slickPg       = "0.23.1"
     val tsec          = "0.5.0"
   }
 
@@ -48,14 +49,6 @@ object Dependencies {
     val circeExtras  = circe("generic-extras", Versions.circeExtras)
     val circeRefined = circe("refined", Versions.circeRefined)
 
-    // Doobie dependencies
-    def doobie(artifact: String, version: String = Versions.doobie): ModuleID =
-      "org.tpolecat" %% s"doobie-$artifact" % version
-
-    val doobieCore     = doobie("core")
-    val doobiePostgres = doobie("postgres")
-    val doobieHikari   = doobie("hikari")
-
     // Chimney dependency (for transformation)
     val chimney = "io.scalaland" %% "chimney" % Versions.chimney
 
@@ -67,8 +60,9 @@ object Dependencies {
     val flyway         = "org.flywaydb" % "flyway-core"                % Versions.flyway
     val flywayPostgres = "org.flywaydb" % "flyway-database-postgresql" % Versions.flyway % Runtime
 
-    // JWT dependency
-    val jwt = "com.github.jwt-scala" %% "jwt-core" % Versions.jwt
+    // JWT dependencies
+    val jwt      = "com.github.jwt-scala" %% "jwt-core"  % Versions.jwt
+    val jwtCirce = "com.github.jwt-scala" %% "jwt-circe" % Versions.jwt
 
     // Refined dependencies (for input validation)
     val refined           = "eu.timepit" %% "refined"            % Versions.refined
@@ -83,6 +77,11 @@ object Dependencies {
     // Logging dependencies (SLF4J + Logback)
     val logback  = "ch.qos.logback" % "logback-classic" % Versions.logback
     val slf4jApi = "org.slf4j"      % "slf4j-api"       % Versions.slf4j
+
+    // Slick dependencies (for PostgreSQL)
+    val slick         = "com.typesafe.slick"  %% "slick"          % Versions.slick
+    val slickHikaricp = "com.typesafe.slick"  %% "slick-hikaricp" % Versions.slick
+    val slickPg       = "com.github.tminglei" %% "slick-pg"       % Versions.slickPg
 
     // Testing dependencies
     val scalatest     = "org.scalatest"     %% "scalatest"               % Versions.scalatest     % Test
@@ -104,15 +103,14 @@ object Dependencies {
     Libraries.circeRefined,
   )
 
-  private val doobie: Seq[ModuleID] = Seq(
-    Libraries.doobieCore,
-    Libraries.doobiePostgres,
-    Libraries.doobieHikari,
-  )
-
   private val enumeratum: Seq[ModuleID] = Seq(
     Libraries.enumeratum,
     Libraries.enumeratumCirce,
+  )
+
+  private val jwt: Seq[ModuleID] = Seq(
+    Libraries.jwt,
+    Libraries.jwtCirce,
   )
 
   private val refined: Seq[ModuleID] = Seq(
@@ -123,6 +121,12 @@ object Dependencies {
   private val logging: Seq[ModuleID] = Seq(
     Libraries.logback,
     Libraries.slf4jApi,
+  )
+
+  private val slick: Seq[ModuleID] = Seq(
+    Libraries.slick,
+    Libraries.slickHikaricp,
+    Libraries.slickPg,
   )
 
   private val testing: Seq[ModuleID] = Seq(
@@ -136,10 +140,9 @@ object Dependencies {
     Libraries.chimney,
     Libraries.flyway,
     Libraries.flywayPostgres,
-    Libraries.jwt,
     Libraries.pureconfig,
     Libraries.postgresql,
     Libraries.bcrypt,
-  ) ++ akka ++ circe ++ doobie ++ enumeratum ++ refined ++ logging ++ testing
+  ) ++ akka ++ circe ++ enumeratum ++ jwt ++ refined ++ logging ++ slick ++ testing
 
 }

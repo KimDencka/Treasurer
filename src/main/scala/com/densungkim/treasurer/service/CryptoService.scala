@@ -1,5 +1,6 @@
 package com.densungkim.treasurer.service
 
+import com.densungkim.treasurer.model.ErrorModels.CryptoException
 import com.densungkim.treasurer.model.user.PasswordHash
 import com.github.t3hnar.bcrypt._
 import org.slf4j.LoggerFactory
@@ -16,16 +17,14 @@ final class CryptoService(implicit ec: ExecutionContext) {
       .map(PasswordHash.apply)
       .recover { case e: Exception =>
         logger.error("Failed to hash password", e)
-        throw CryptoException("Failed to hash password", e)
+        throw CryptoException(s"Failed to hash password; $e")
       }
 
-  def isValid(password: String, passwordHash: PasswordHash): Future[Boolean] =
+  def validate(password: String, passwordHash: PasswordHash): Future[Boolean] =
     Future
       .fromTry(password.isBcryptedSafeBounded(passwordHash.value))
       .recover { case e: Exception =>
         logger.error("Failed to validate password", e)
-        throw CryptoException("Failed to validate password", e)
+        throw CryptoException(s"Failed to validate password; e")
       }
 }
-
-case class CryptoException(message: String, cause: Throwable) extends RuntimeException(message, cause)
