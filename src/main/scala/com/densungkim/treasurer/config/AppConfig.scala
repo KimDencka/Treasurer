@@ -7,7 +7,8 @@ import eu.timepit.refined.pureconfig._ // DON'T REMOVE THIS LINE
 
 final case class AppConfig(
   http: HttpConfig,
-  postgres: PostgresConfig
+  postgres: PostgresConfig,
+  executionContexts: ExecutionContextsConfig,
 ) {
 
   /**
@@ -41,7 +42,7 @@ object AppConfig {
 
   def loadConfig: AppConfig =
     ConfigSource.default.load[AppConfig] match {
-      case Right(config)                        =>
+      case Right(config)                      =>
         logger.info(s"AppConfig loaded successfully: $config")
         config
       case Left(errors: ConfigReaderFailures) =>
