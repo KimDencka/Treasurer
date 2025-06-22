@@ -10,11 +10,11 @@ final case class PostgresConfig(
   schema: NonEmptyString,
   password: NonEmptyString,
   jdbcUrl: NonEmptyString,
-  connections: DbConnectionsCfg
+  connections: DbConnectionsCfg,
 )
 
 final case class DbConnectionsCfg(
   poolSize: PosInt,
   maxLifetime: PosInt,
-  minimumIdle: PosInt
+  minimumIdle: PosInt,
 )

@@ -9,5 +9,5 @@ final case class HttpConfig(
   port: PosInt,
   requestTimeout: FiniteDuration,
   idleTimeout: FiniteDuration,
-  backlog: PosInt
+  backlog: PosInt,
 )

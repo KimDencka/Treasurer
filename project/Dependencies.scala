@@ -5,11 +5,15 @@ object Dependencies {
   private object Versions {
     val akka          = "2.8.8"
     val akkaHttp      = "10.5.3"
+    val bcrypt        = "4.3.0"
     val circe         = "0.14.14"
+    val circeRefined  = "0.15.1"
+    val circeExtras   = "0.14.4"
     val chimney       = "1.8.1"
     val doobie        = "1.0.0-RC9"
     val enumeratum    = "1.9.0"
     val flyway        = "11.9.2"
+    val jwt           = "11.0.0"
     val logback       = "1.5.18"
     val mockito       = "2.0.0"
     val pureconfig    = "0.17.9"
@@ -18,6 +22,7 @@ object Dependencies {
     val scalatest     = "3.2.19"
     val scalatestPlus = "3.2.19.0"
     val slf4j         = "2.0.17"
+    val tsec          = "0.5.0"
   }
 
   private object Libraries {
@@ -30,6 +35,9 @@ object Dependencies {
     val akkaHttp        = akka("http", Versions.akkaHttp)
     val akkaHttpTestkit = akka("http-testkit", Versions.akkaHttp) % Test
 
+    // Cryptography  dependency
+    val bcrypt = "com.github.t3hnar" %% "scala-bcrypt" % Versions.bcrypt
+
     // Circe dependencies
     def circe(artifact: String, version: String = Versions.circe): ModuleID =
       "io.circe" %% s"circe-$artifact" % version
@@ -37,6 +45,8 @@ object Dependencies {
     val circeCore    = circe("core")
     val circeGeneric = circe("generic")
     val circeParser  = circe("parser")
+    val circeExtras  = circe("generic-extras", Versions.circeExtras)
+    val circeRefined = circe("refined", Versions.circeRefined)
 
     // Doobie dependencies
     def doobie(artifact: String, version: String = Versions.doobie): ModuleID =
@@ -56,6 +66,9 @@ object Dependencies {
     // Flyway dependency (for database migration)
     val flyway         = "org.flywaydb" % "flyway-core"                % Versions.flyway
     val flywayPostgres = "org.flywaydb" % "flyway-database-postgresql" % Versions.flyway % Runtime
+
+    // JWT dependency
+    val jwt = "com.github.jwt-scala" %% "jwt-core" % Versions.jwt
 
     // Refined dependencies (for input validation)
     val refined           = "eu.timepit" %% "refined"            % Versions.refined
@@ -80,49 +93,53 @@ object Dependencies {
   private val akka: Seq[ModuleID] = Seq(
     Libraries.akkaStreams,
     Libraries.akkaSlf4j,
-    Libraries.akkaHttp
+    Libraries.akkaHttp,
   )
 
   private val circe: Seq[ModuleID] = Seq(
     Libraries.circeCore,
     Libraries.circeGeneric,
-    Libraries.circeParser
+    Libraries.circeParser,
+    Libraries.circeExtras,
+    Libraries.circeRefined,
   )
 
   private val doobie: Seq[ModuleID] = Seq(
     Libraries.doobieCore,
     Libraries.doobiePostgres,
-    Libraries.doobieHikari
+    Libraries.doobieHikari,
   )
 
   private val enumeratum: Seq[ModuleID] = Seq(
     Libraries.enumeratum,
-    Libraries.enumeratumCirce
+    Libraries.enumeratumCirce,
   )
 
   private val refined: Seq[ModuleID] = Seq(
     Libraries.refined,
-    Libraries.refinedPureconfig
+    Libraries.refinedPureconfig,
   )
 
   private val logging: Seq[ModuleID] = Seq(
     Libraries.logback,
-    Libraries.slf4jApi
+    Libraries.slf4jApi,
   )
 
   private val testing: Seq[ModuleID] = Seq(
     Libraries.akkaHttpTestkit,
     Libraries.scalatest,
     Libraries.scalatestPlus,
-    Libraries.mockito
+    Libraries.mockito,
   )
 
   val librariesDependencies: Seq[ModuleID] = Seq(
     Libraries.chimney,
     Libraries.flyway,
     Libraries.flywayPostgres,
+    Libraries.jwt,
     Libraries.pureconfig,
-    Libraries.postgresql
+    Libraries.postgresql,
+    Libraries.bcrypt,
   ) ++ akka ++ circe ++ doobie ++ enumeratum ++ refined ++ logging ++ testing
 
 }
