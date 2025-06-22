@@ -25,6 +25,17 @@ final case class TransactionRequest(
     )
 }
 object TransactionRequest extends JsonUtils {
+  val request                                       = TransactionRequest(
+    PosBigDecimal.unsafeFrom(BigDecimal("100000")),
+    TransactionType.INCOME,
+    Some(NonEmptyString.unsafeFrom("Some description")),
+  )
   implicit val encoder: Encoder[TransactionRequest] = deriveConfiguredEncoder
   implicit val decoder: Decoder[TransactionRequest] = deriveConfiguredDecoder
+
+  import io.circe.syntax._
+  val json = request.asJson
+  val decoded = json.as[TransactionRequest]
+  println(s"JSON: $json")
+  println(s"DECODED: $decoded")
 }

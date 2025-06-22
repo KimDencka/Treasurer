@@ -5,12 +5,11 @@ CREATE TABLE users (
   created_at TIMESTAMP NOT NULL
 );
 
-CREATE TYPE transaction_type AS ENUM ('INCOME', 'EXPENSE');
 CREATE TABLE transactions (
   id UUID PRIMARY KEY,
   user_id UUID NOT NULL,
   amount DECIMAL(15, 2) NOT NULL,
-  type transaction_type NOT NULL,
+  type VARCHAR(50) NOT NULL,
   description TEXT,
   created_at TIMESTAMP NOT NULL
 );

@@ -1,0 +1,10 @@
+services:
+  postgres:
+    restart: always
+    image: postgres:16.4
+    ports:
+      - "5432:5432"
+    environment:
+      - DEBUG=true
+      - POSTGRES_DB=treasurer
+      - POSTGRES_PASSWORD=postgres
