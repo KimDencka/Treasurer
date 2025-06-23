@@ -33,12 +33,12 @@ final class UserServiceImpl(
   override def update(id: UUID, request: UserRequest): Future[UserResponse] =
     for {
       passwordHash <- cryptoService.hashPassword(request.password.value)
-      user         <- repository.getById(id).flatMap {
+      user         <- repository.getById(id).map {
                         case Some(u) =>
-                          Future.successful(u.copy(username = request.username.value, password = passwordHash))
+                          u.copy(username = request.username.value, password = passwordHash)
                         case None    =>
                           logger.warn(s"Update failed: user '$id' not found")
-                          Future.failed(UserNotFound(s"User with ID '$id' not found"))
+                          throw UserNotFound(s"User with ID '$id' not found")
                       }
       updated      <- repository.update(user).map {
                         case Some(u) => UserResponse(u.id, u.username, u.createdAt)
@@ -50,29 +50,28 @@ final class UserServiceImpl(
     } yield updated
 
   override def getById(id: UUID): Future[UserResponse] =
-    repository.getById(id).flatMap {
-      case Some(user) => Future.successful(UserResponse(user.id, user.username, user.createdAt))
+    repository.getById(id).map {
+      case Some(user) => UserResponse(user.id, user.username, user.createdAt)
       case None       =>
         logger.warn(s"Get failed: user $id not found")
-        Future.failed(UserNotFound(s"User with ID $id not found"))
+        throw UserNotFound(s"User with ID $id not found")
     }
 
   override def getByUsername(username: String): Future[UserResponse] =
-    repository.getByUsername(username).flatMap {
-      case Some(user) => Future.successful(UserResponse(user.id, user.username, user.createdAt))
+    repository.getByUsername(username).map {
+      case Some(user) => UserResponse(user.id, user.username, user.createdAt)
       case None       =>
         logger.warn(s"Get failed: user $username not found")
-        Future.failed(UserNotFound(s"User with username $username not found"))
+        throw UserNotFound(s"User with username $username not found")
     }
 
   override def delete(id: UUID): Future[Unit] =
-    repository.delete(id).flatMap {
+    repository.delete(id).map {
       case true  =>
         logger.info(s"User deleted: $id")
-        Future.unit
       case false =>
         logger.warn(s"Delete failed: user $id not found")
-        Future.failed(UserNotFound(s"User with ID $id not found"))
+        throw UserNotFound(s"User with ID $id not found")
     }
 
 }

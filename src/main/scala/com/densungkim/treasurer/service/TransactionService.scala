@@ -1,8 +1,8 @@
 package com.densungkim.treasurer.service
 
-import com.densungkim.treasurer.model.ErrorModels.{TransactionNotFound, UserNotFound}
+import com.densungkim.treasurer.model.ErrorModels.TransactionNotFound
 import com.densungkim.treasurer.model.transaction.{TransactionRequest, TransactionResponse, TransactionType}
-import com.densungkim.treasurer.repository.{TransactionRepository, UserRepository}
+import com.densungkim.treasurer.repository.TransactionRepository
 import org.slf4j.LoggerFactory
 
 import java.util.UUID
@@ -19,37 +19,26 @@ trait TransactionService {
 
 final class TransactionServiceImpl(
   repository: TransactionRepository,
-  userRepository: UserRepository,
 )(implicit ec: ExecutionContext)
   extends TransactionService {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  private def ensureUserExists(userId: UUID): Future[Unit] =
-    userRepository.getById(userId).flatMap {
-      case Some(_) => Future.unit
-      case None    =>
-        logger.warn(s"Operation failed: user $userId not found")
-        Future.failed(UserNotFound(s"User with ID $userId not found"))
-    }
-
   override def create(userId: UUID, request: TransactionRequest): Future[TransactionResponse] =
     for {
-      _           <- ensureUserExists(userId)
       transaction <- repository.create(request.toDomain(userId))
       _            = logger.info(s"Transaction created: ${transaction.id} for user $userId")
     } yield transaction.toResponse
 
   override def update(id: UUID, userId: UUID, request: TransactionRequest): Future[TransactionResponse] =
     for {
-      _        <- ensureUserExists(userId)
-      existing <- repository.getById(id).flatMap {
-                    case Some(t) if t.userId == userId => Future.successful(t)
-                    case Some(_)                       =>
+      existing <- repository.getById(id).map {
+                    case Some(transaction) if transaction.userId == userId => transaction
+                    case Some(_)                                           =>
                       logger.warn(s"Update failed: transaction '$id' does not belong to user $userId")
-                      Future.failed(TransactionNotFound(s"Transaction with ID '$id' not found"))
-                    case None                          =>
+                      throw TransactionNotFound(s"Transaction with ID '$id' not found")
+                    case None                                              =>
                       logger.warn(s"Update failed: transaction '$id' not found")
-                      Future.failed(TransactionNotFound(s"Transaction with ID '$id' not found"))
+                      throw TransactionNotFound(s"Transaction with ID '$id' not found")
                   }
       updated  <- repository
                     .update(
@@ -69,28 +58,22 @@ final class TransactionServiceImpl(
     } yield updated
 
   override def getById(id: UUID, userId: UUID): Future[TransactionResponse] =
-    repository.getById(id).flatMap {
-      case Some(t) if t.userId == userId =>
-        Future.successful(t.toResponse)
-      case Some(_)                       =>
+    repository.getById(id).map {
+      case Some(transaction) if transaction.userId == userId =>
+        transaction.toResponse
+      case Some(_)                                           =>
         logger.warn(s"Get failed: transaction '$id' does not belong to user $userId")
-        Future.failed(TransactionNotFound(s"Transaction with ID '$id' not found"))
-      case None                          =>
+        throw TransactionNotFound(s"Transaction with ID '$id' not found")
+      case None                                              =>
         logger.warn(s"Get failed: transaction '$id' not found")
-        Future.failed(TransactionNotFound(s"Transaction with ID '$id' not found"))
+        throw TransactionNotFound(s"Transaction with ID '$id' not found")
     }
 
   override def getAll(userId: UUID): Future[Seq[TransactionResponse]] =
-    for {
-      _            <- ensureUserExists(userId)
-      transactions <- repository.getAll(userId)
-    } yield transactions.map(_.toResponse)
+    repository.getAll(userId).map(_.map(_.toResponse))
 
   override def getByType(userId: UUID, `type`: TransactionType): Future[Seq[TransactionResponse]] =
-    for {
-      _            <- ensureUserExists(userId)
-      transactions <- repository.getByType(userId, `type`)
-    } yield transactions.map(_.toResponse)
+    repository.getByType(userId, `type`).map(_.map(_.toResponse))
 
   override def delete(id: UUID, userId: UUID): Future[Unit] =
     repository.getById(id).flatMap {
@@ -104,10 +87,10 @@ final class TransactionServiceImpl(
         }
       case Some(_)                       =>
         logger.warn(s"Delete failed: transaction '$id' does not belong to user $userId")
-        Future.failed(TransactionNotFound(s"Transaction with ID '$id' not found"))
+        throw TransactionNotFound(s"Transaction with ID '$id' not found")
       case None                          =>
         logger.warn(s"Delete failed: transaction '$id' not found")
-        Future.failed(TransactionNotFound(s"Transaction with ID '$id' not found"))
+        throw TransactionNotFound(s"Transaction with ID '$id' not found")
     }
 
 }
