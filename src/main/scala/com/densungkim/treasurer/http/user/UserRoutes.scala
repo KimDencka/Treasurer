@@ -38,37 +38,37 @@ final class UserRoutes(
                   complete(StatusCodes.NotFound -> e.getMessage)
               }
             }
-        }
-      } ~
-        path(Segment) { username =>
-          get {
-            onComplete(userService.getByUsername(username)) {
-              case Success(userResponse) =>
-                complete(StatusCodes.OK -> userResponse)
-              case Failure(e)            =>
-                complete(StatusCodes.NotFound -> e.getMessage)
-            }
-          }
-        }
-    } ~
-      path(JavaUUID) { id =>
-        put {
-          entity(as[UserRequest]) { request =>
-            onComplete(userService.update(id, request)) {
-              case Success(userResponse) =>
-                complete(StatusCodes.OK -> userResponse)
-              case Failure(e)            =>
-                complete(StatusCodes.NotFound -> e.getMessage)
-            }
-          }
         } ~
-          delete {
-            onComplete(userService.delete(id)) {
-              case Success(_) =>
-                complete(StatusCodes.NoContent)
-              case Failure(e) =>
-                complete(StatusCodes.NotFound -> e.getMessage)
+          path(Segment) { username =>
+            get {
+              onComplete(userService.getByUsername(username)) {
+                case Success(userResponse) =>
+                  complete(StatusCodes.OK -> userResponse)
+                case Failure(e)            =>
+                  complete(StatusCodes.NotFound -> e.getMessage)
+              }
             }
+          } ~
+          path(JavaUUID) { id =>
+            put {
+              entity(as[UserRequest]) { request =>
+                onComplete(userService.update(id, request)) {
+                  case Success(userResponse) =>
+                    complete(StatusCodes.OK -> userResponse)
+                  case Failure(e)            =>
+                    complete(StatusCodes.NotFound -> e.getMessage)
+                }
+              }
+            } ~
+              delete {
+                onComplete(userService.delete(id)) {
+                  case Success(_) =>
+                    complete(StatusCodes.NoContent)
+                  case Failure(e) =>
+                    complete(StatusCodes.NotFound -> e.getMessage)
+                }
+              }
           }
       }
+    }
 }
