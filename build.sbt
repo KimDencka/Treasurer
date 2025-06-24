@@ -8,8 +8,11 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 lazy val root = (project in file("."))
   .settings(
-    name := "treasurer",
+    name        := "treasurer",
+    libraryDependencies ++= Dependencies.librariesDependencies,
     scalacOptions ++= CompilerOptions.cOptions,
     Test / scalacOptions --= Seq("-Xfatal-warnings"),
-    libraryDependencies ++= Dependencies.librariesDependencies,
+    Test / test := (Test / test).dependsOn(Test / scalafmt).value,
+    Test / javaOptions += "-Xshare:off",
+    Test / fork := true,
   )
