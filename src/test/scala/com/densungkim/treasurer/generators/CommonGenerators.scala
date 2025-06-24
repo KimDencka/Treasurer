@@ -1,4 +1,4 @@
-package com.densungkim.treasurer
+package com.densungkim.treasurer.generators
 
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.types.string.NonEmptyString
@@ -8,7 +8,7 @@ import org.scalacheck.Gen
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDate, LocalDateTime}
 
-trait CommonArbitraries {
+trait CommonGenerators {
 
   def genString(n: Int): Gen[String] = Gen.listOfN(n, Gen.alphaChar).map(_.mkString)
 

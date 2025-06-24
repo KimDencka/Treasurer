@@ -15,7 +15,7 @@ trait AuthService {
   def validateToken(token: String): Option[UUID]
 }
 
-final class AuthServiceImpl(
+class AuthServiceImpl(
   cryptoService: CryptoService,
   userRepository: UserRepository,
   jwtConfig: JwtConfig,
@@ -33,7 +33,7 @@ final class AuthServiceImpl(
     for {
       user    <- userRepository
                    .getByUsername(request.username.value)
-                   .map(_.getOrElse(throw UserNotFound(s"The user '${request.username}'  not found.")))
+                   .map(_.getOrElse(throw UserNotFound(s"The user '${request.username}' not found.")))
       isValid <- cryptoService.validate(request.password.value, user.password)
       result   = if (isValid) {
                    AuthResponse(createToken(user.id, jwtConfig))
