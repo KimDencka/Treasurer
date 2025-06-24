@@ -4,10 +4,11 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.Directives._
 import com.densungkim.treasurer.service.AuthService
+import com.densungkim.treasurer.util.JwtUtils
 
 import java.util.UUID
 
-trait AuthDirectives {
+trait AuthDirectives extends JwtUtils {
   def authService_ : AuthService
 
   def authenticate: Directive1[UUID] =

@@ -4,7 +4,7 @@ import com.densungkim.treasurer.config.JwtConfig
 import com.densungkim.treasurer.model.ErrorModels.{IncorrectPassword, UserNotFound}
 import com.densungkim.treasurer.model.user.{AuthResponse, UserRequest, UserResponse}
 import com.densungkim.treasurer.repository.UserRepository
-import com.densungkim.treasurer.util.JwtUtil
+import com.densungkim.treasurer.util.JwtUtils
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,7 +20,8 @@ final class AuthServiceImpl(
   userRepository: UserRepository,
   jwtConfig: JwtConfig,
 )(implicit val ec: ExecutionContext)
-  extends AuthService {
+  extends AuthService
+  with JwtUtils {
 
   override def register(request: UserRequest): Future[UserResponse] =
     for {
@@ -35,12 +36,12 @@ final class AuthServiceImpl(
                    .map(_.getOrElse(throw UserNotFound(s"The user '${request.username}'  not found.")))
       isValid <- cryptoService.validate(request.password.value, user.password)
       result   = if (isValid) {
-                   AuthResponse(JwtUtil.createToken(user.id, jwtConfig))
+                   AuthResponse(createToken(user.id, jwtConfig))
                  } else {
                    throw IncorrectPassword("The password is incorrect; Please, try again.")
                  }
     } yield result
 
   override def validateToken(token: String): Option[UUID] =
-    JwtUtil.validateToken(token, jwtConfig)
+    validateToken(token, jwtConfig)
 }
