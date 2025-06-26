@@ -1,10 +1,10 @@
-package com.densungkim.treasurer
+package com.densungkim.treasurer.service
 
+import com.densungkim.treasurer.TestUtils
 import com.densungkim.treasurer.config.JwtConfig
 import com.densungkim.treasurer.model.ErrorModels.{IncorrectPassword, UserNotFound}
 import com.densungkim.treasurer.model.user.{AuthResponse, PasswordHash, User}
 import com.densungkim.treasurer.repository.UserRepository
-import com.densungkim.treasurer.service.{AuthService, AuthServiceImpl, CryptoService}
 import eu.timepit.refined.types.string.NonEmptyString
 import org.scalacheck.Gen
 
