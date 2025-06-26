@@ -4,6 +4,8 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import com.densungkim.treasurer.http.auth.AuthDirectives
+import com.densungkim.treasurer.http.rejectionHandler
+import com.densungkim.treasurer.model.ErrorModels.UserNotFound
 import com.densungkim.treasurer.model.user.UserRequest
 import com.densungkim.treasurer.service.{AuthService, UserService}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
@@ -17,58 +19,68 @@ final class UserRoutes(
   override def authService_ : AuthService = authService
 
   val routes: Route =
-    pathPrefix("users") {
-      authenticate { userId =>
-        pathEndOrSingleSlash {
-          post {
-            entity(as[UserRequest]) { request =>
-              onComplete(userService.create(request)) {
-                case Success(userResponse) =>
-                  complete(StatusCodes.Created -> userResponse)
-                case Failure(e)            =>
-                  complete(StatusCodes.BadRequest -> e.getMessage)
-              }
-            }
-          } ~
-            get {
-              onComplete(userService.getById(userId)) {
-                case Success(userResponse) =>
-                  complete(StatusCodes.OK -> userResponse)
-                case Failure(e)            =>
-                  complete(StatusCodes.NotFound -> e.getMessage)
-              }
-            }
-        } ~
-          path(Segment) { username =>
-            get {
-              onComplete(userService.getByUsername(username)) {
-                case Success(userResponse) =>
-                  complete(StatusCodes.OK -> userResponse)
-                case Failure(e)            =>
-                  complete(StatusCodes.NotFound -> e.getMessage)
-              }
-            }
-          } ~
-          path(JavaUUID) { id =>
-            put {
+    handleRejections(rejectionHandler) {
+      pathPrefix("users") {
+        authenticate { userId =>
+          pathEndOrSingleSlash {
+            post {
               entity(as[UserRequest]) { request =>
-                onComplete(userService.update(id, request)) {
+                onComplete(userService.create(request)) {
                   case Success(userResponse) =>
-                    complete(StatusCodes.OK -> userResponse)
+                    complete(StatusCodes.Created -> userResponse)
                   case Failure(e)            =>
-                    complete(StatusCodes.NotFound -> e.getMessage)
+                    complete(StatusCodes.BadRequest -> e.getMessage)
                 }
               }
             } ~
-              delete {
-                onComplete(userService.delete(id)) {
-                  case Success(_) =>
-                    complete(StatusCodes.NoContent)
-                  case Failure(e) =>
-                    complete(StatusCodes.NotFound -> e.getMessage)
+              get {
+                onComplete(userService.getById(userId)) {
+                  case Success(userResponse)    =>
+                    complete(StatusCodes.OK -> userResponse)
+                  case Failure(e: UserNotFound) =>
+                    complete(StatusCodes.NotFound -> e.message)
+                  case Failure(e)               =>
+                    complete(StatusCodes.InternalServerError -> e.getMessage)
                 }
               }
-          }
+          } ~
+            path(Segment) { username =>
+              get {
+                onComplete(userService.getByUsername(username)) {
+                  case Success(userResponse)    =>
+                    complete(StatusCodes.OK -> userResponse)
+                  case Failure(e: UserNotFound) =>
+                    complete(StatusCodes.NotFound -> e.message)
+                  case Failure(e)               =>
+                    complete(StatusCodes.InternalServerError -> e.getMessage)
+                }
+              }
+            } ~
+            path(JavaUUID) { id =>
+              put {
+                entity(as[UserRequest]) { request =>
+                  onComplete(userService.update(id, request)) {
+                    case Success(userResponse)    =>
+                      complete(StatusCodes.OK -> userResponse)
+                    case Failure(e: UserNotFound) =>
+                      complete(StatusCodes.NotFound -> e.message)
+                    case Failure(e)               =>
+                      complete(StatusCodes.InternalServerError -> e.getMessage)
+                  }
+                }
+              } ~
+                delete {
+                  onComplete(userService.delete(id)) {
+                    case Success(_)               =>
+                      complete(StatusCodes.NoContent)
+                    case Failure(e: UserNotFound) =>
+                      complete(StatusCodes.NotFound -> e.message)
+                    case Failure(e)               =>
+                      complete(StatusCodes.InternalServerError -> e.getMessage)
+                  }
+                }
+            }
+        }
       }
     }
 }

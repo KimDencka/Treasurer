@@ -6,9 +6,13 @@ import com.densungkim.treasurer.model.user.{PasswordHash, User}
 import com.densungkim.treasurer.repository.UserRepository
 import org.scalacheck.Gen
 
-import scala.concurrent.Future
+import java.util.concurrent.{ExecutorService, Executors}
+import scala.concurrent.{ExecutionContext, Future}
 
 class UserServiceImplSpec extends TestUtils {
+  private val testExecutor: ExecutorService = Executors.newFixedThreadPool(4)
+  implicit private val ec: ExecutionContext = ExecutionContext.fromExecutor(testExecutor)
+
   val mockCryptoService: CryptoService   = mock[CryptoService]
   val mockUserRepository: UserRepository = mock[UserRepository]
   val passwordHash: PasswordHash         = PasswordHash("password-hash")

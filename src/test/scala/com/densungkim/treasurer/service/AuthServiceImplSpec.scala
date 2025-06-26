@@ -9,10 +9,16 @@ import eu.timepit.refined.types.string.NonEmptyString
 import org.scalacheck.Gen
 
 import java.util.UUID
-import scala.concurrent.Future
+import java.util.concurrent.{ExecutorService, Executors}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 class AuthServiceImplSpec extends TestUtils {
+  private val testExecutor: ExecutorService = Executors.newFixedThreadPool(4)
+  implicit private val ec: ExecutionContext = ExecutionContext.fromExecutor(testExecutor)
+
+  override def afterAll(): Unit = testExecutor.shutdown()
+
   val mockCryptoService: CryptoService   = mock[CryptoService]
   val mockUserRepository: UserRepository = mock[UserRepository]
 

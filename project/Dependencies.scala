@@ -3,28 +3,29 @@ import sbt.*
 object Dependencies {
 
   private object Versions {
-    val akka          = "2.8.8"
-    val akkaHttp      = "10.5.3"
-    val akkaCirce     = "1.39.2"
-    val bcrypt        = "4.3.0"
-    val circe         = "0.14.14"
-    val circeRefined  = "0.15.1"
-    val circeExtras   = "0.14.4"
-    val chimney       = "1.8.1"
-    val enumeratum    = "1.9.0"
-    val flyway        = "11.9.2"
-    val jwt           = "11.0.0"
-    val logback       = "1.5.18"
-    val mockito       = "2.0.0"
-    val pureconfig    = "0.17.9"
-    val postgresql    = "42.7.7"
-    val refined       = "0.11.3"
-    val scalatest     = "3.2.19"
-    val scalatestPlus = "3.2.19.0"
-    val slf4j         = "2.0.17"
-    val slick         = "3.6.1"
-    val slickPg       = "0.23.1"
-    val tsec          = "0.5.0"
+    val akka           = "2.8.8"
+    val akkaHttp       = "10.5.3"
+    val akkaCirce      = "1.39.2"
+    val bcrypt         = "4.3.0"
+    val circe          = "0.14.14"
+    val circeRefined   = "0.15.1"
+    val circeExtras    = "0.14.4"
+    val chimney        = "1.8.1"
+    val enumeratum     = "1.9.0"
+    val flyway         = "11.9.2"
+    val jwt            = "11.0.0"
+    val logback        = "1.5.18"
+    val mockito        = "2.0.0"
+    val pureconfig     = "0.17.9"
+    val postgresql     = "42.7.7"
+    val refined        = "0.11.3"
+    val scalatest      = "3.2.19"
+    val scalatestPlus  = "3.2.19.0"
+    val slf4j          = "2.0.17"
+    val slick          = "3.6.1"
+    val slickPg        = "0.23.1"
+    val tsec           = "0.5.0"
+    val testcontainers = "1.21.2"
   }
 
   private object Libraries {
@@ -35,6 +36,7 @@ object Dependencies {
     val akkaStreams     = akka("stream")
     val akkaSlf4j       = akka("slf4j")
     val akkaHttp        = akka("http", Versions.akkaHttp)
+    val akkaTestkit     = akka("testkit")                         % Test
     val akkaHttpTestkit = akka("http-testkit", Versions.akkaHttp) % Test
     val akkaCirce       = "de.heikoseeberger"                    %% "akka-http-circe" % Versions.akkaCirce
 
@@ -86,9 +88,11 @@ object Dependencies {
     val slickPg       = "com.github.tminglei" %% "slick-pg"       % Versions.slickPg
 
     // Testing dependencies
-    val scalatest     = "org.scalatest"     %% "scalatest"               % Versions.scalatest     % Test
-    val scalatestPlus = "org.scalatestplus" %% "scalacheck-1-18"         % Versions.scalatestPlus % Test
-    val mockito       = "org.mockito"       %% "mockito-scala-scalatest" % Versions.mockito       % Test
+    val scalatest        = "org.scalatest"     %% "scalatest"               % Versions.scalatest      % Test
+    val scalatestPlus    = "org.scalatestplus" %% "scalacheck-1-18"         % Versions.scalatestPlus  % Test
+    val mockito          = "org.mockito"       %% "mockito-scala-scalatest" % Versions.mockito        % Test
+    val testcontainers   = "org.testcontainers" % "testcontainers"          % Versions.testcontainers % Test
+    val testcontainersPg = "org.testcontainers" % "postgresql"              % Versions.testcontainers % Test
   }
 
   private val akka: Seq[ModuleID] = Seq(
@@ -133,10 +137,13 @@ object Dependencies {
   )
 
   private val testing: Seq[ModuleID] = Seq(
+    Libraries.akkaTestkit,
     Libraries.akkaHttpTestkit,
     Libraries.scalatest,
     Libraries.scalatestPlus,
     Libraries.mockito,
+    Libraries.testcontainers,
+    Libraries.testcontainersPg,
   )
 
   val librariesDependencies: Seq[ModuleID] = Seq(

@@ -6,9 +6,13 @@ import com.densungkim.treasurer.model.transaction.{Transaction, TransactionType}
 import com.densungkim.treasurer.repository.TransactionRepository
 import org.scalacheck.Gen
 
-import scala.concurrent.Future
+import java.util.concurrent.{ExecutorService, Executors}
+import scala.concurrent.{ExecutionContext, Future}
 
 class TransactionServiceImplSpec extends TestUtils {
+  private val testExecutor: ExecutorService = Executors.newFixedThreadPool(4)
+  implicit private val ec: ExecutionContext = ExecutionContext.fromExecutor(testExecutor)
+
   val mockTransactionRepository: TransactionRepository = mock[TransactionRepository]
   val transactionService: TransactionService           = new TransactionServiceImpl(mockTransactionRepository)
 

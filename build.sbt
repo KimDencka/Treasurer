@@ -16,3 +16,13 @@ lazy val root = (project in file("."))
     Test / javaOptions += "-Xshare:off",
     Test / fork := true,
   )
+
+lazy val integration = (project in file("integration"))
+  .dependsOn(root % "compile->compile;test->test")
+  .settings(
+    name := "integration",
+    scalacOptions ++= CompilerOptions.cOptions,
+    Test / parallelExecution := false,
+    Test / scalacOptions --= Seq("-Xfatal-warnings"),
+    Test / test := (Test / test).dependsOn(Test / scalafmt).value,
+  )
