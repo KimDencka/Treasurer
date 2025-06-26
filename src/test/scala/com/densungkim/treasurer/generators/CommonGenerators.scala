@@ -1,6 +1,7 @@
 package com.densungkim.treasurer.generators
 
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -34,6 +35,8 @@ trait CommonGenerators {
 
   def genNonNegativeBigDecimal: Gen[BigDecimal] = genNonNegativeInt.map(v => BigDecimal(s"$v.00"))
 
+  def genPosBigDecimal: Gen[PosBigDecimal] = genSmallInt.map(v => PosBigDecimal.unsafeFrom(BigDecimal(v)))
+
   def genSmallInt: Gen[Int] = Gen.choose(1, 64)
 
   def genSmallLong: Gen[Long] = Gen.choose[Long](1, 64)
@@ -46,7 +49,7 @@ trait CommonGenerators {
       str <- genString(n)
     } yield str
 
-  def genRefinedNEString: Gen[NonEmptyString] = genStringNoShorterThan(15).map(Refined.unsafeApply)
+  def genNonEmptyString: Gen[NonEmptyString] = genStringNoShorterThan(15).map(Refined.unsafeApply)
 
   def genLocalDateTime: Gen[LocalDateTime] =
     Gen
