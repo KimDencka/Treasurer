@@ -1,6 +1,6 @@
 package com.densungkim.treasurer
 
-import com.densungkim.treasurer.generators.UserGenerators
+import com.densungkim.treasurer.generators.{TransactionGenerators, UserGenerators}
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext
 trait TestUtils
   extends AnyWordSpec
   with UserGenerators
+  with TransactionGenerators
   with BeforeAndAfterAll
   with Matchers
   with ScalaFutures

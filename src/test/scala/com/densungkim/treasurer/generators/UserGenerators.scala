@@ -7,8 +7,8 @@ trait UserGenerators extends CommonGenerators {
 
   def genUserRequest: Gen[UserRequest] =
     for {
-      username <- genRefinedNEString
-      password <- genRefinedNEString
+      username <- genNonEmptyString
+      password <- genNonEmptyString
     } yield UserRequest(username, password)
 
   def genUser: Gen[User] =
