@@ -36,6 +36,7 @@ object Dependencies {
     val akkaStreams     = akka("stream")
     val akkaSlf4j       = akka("slf4j")
     val akkaHttp        = akka("http", Versions.akkaHttp)
+    val akkaTestkit     = akka("testkit")                         % Test
     val akkaHttpTestkit = akka("http-testkit", Versions.akkaHttp) % Test
     val akkaCirce       = "de.heikoseeberger"                    %% "akka-http-circe" % Versions.akkaCirce
 
@@ -136,6 +137,7 @@ object Dependencies {
   )
 
   private val testing: Seq[ModuleID] = Seq(
+    Libraries.akkaTestkit,
     Libraries.akkaHttpTestkit,
     Libraries.scalatest,
     Libraries.scalatestPlus,
