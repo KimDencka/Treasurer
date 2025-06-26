@@ -5,6 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import com.densungkim.treasurer.http.auth.AuthDirectives
 import com.densungkim.treasurer.http.rejectionHandler
+import com.densungkim.treasurer.model.ErrorModels.UserNotFound
 import com.densungkim.treasurer.model.user.UserRequest
 import com.densungkim.treasurer.service.{AuthService, UserService}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
@@ -34,20 +35,24 @@ final class UserRoutes(
             } ~
               get {
                 onComplete(userService.getById(userId)) {
-                  case Success(userResponse) =>
+                  case Success(userResponse)    =>
                     complete(StatusCodes.OK -> userResponse)
-                  case Failure(e)            =>
-                    complete(StatusCodes.NotFound -> e.getMessage)
+                  case Failure(e: UserNotFound) =>
+                    complete(StatusCodes.NotFound -> e.message)
+                  case Failure(e)               =>
+                    complete(StatusCodes.InternalServerError -> e.getMessage)
                 }
               }
           } ~
             path(Segment) { username =>
               get {
                 onComplete(userService.getByUsername(username)) {
-                  case Success(userResponse) =>
+                  case Success(userResponse)    =>
                     complete(StatusCodes.OK -> userResponse)
-                  case Failure(e)            =>
-                    complete(StatusCodes.NotFound -> e.getMessage)
+                  case Failure(e: UserNotFound) =>
+                    complete(StatusCodes.NotFound -> e.message)
+                  case Failure(e)               =>
+                    complete(StatusCodes.InternalServerError -> e.getMessage)
                 }
               }
             } ~
@@ -55,19 +60,23 @@ final class UserRoutes(
               put {
                 entity(as[UserRequest]) { request =>
                   onComplete(userService.update(id, request)) {
-                    case Success(userResponse) =>
+                    case Success(userResponse)    =>
                       complete(StatusCodes.OK -> userResponse)
-                    case Failure(e)            =>
-                      complete(StatusCodes.NotFound -> e.getMessage)
+                    case Failure(e: UserNotFound) =>
+                      complete(StatusCodes.NotFound -> e.message)
+                    case Failure(e)               =>
+                      complete(StatusCodes.InternalServerError -> e.getMessage)
                   }
                 }
               } ~
                 delete {
                   onComplete(userService.delete(id)) {
-                    case Success(_) =>
+                    case Success(_)               =>
                       complete(StatusCodes.NoContent)
-                    case Failure(e) =>
-                      complete(StatusCodes.NotFound -> e.getMessage)
+                    case Failure(e: UserNotFound) =>
+                      complete(StatusCodes.NotFound -> e.message)
+                    case Failure(e)               =>
+                      complete(StatusCodes.InternalServerError -> e.getMessage)
                   }
                 }
             }
