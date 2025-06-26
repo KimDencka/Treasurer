@@ -25,6 +25,6 @@ final class CryptoService(implicit ec: ExecutionContext) {
       .fromTry(password.isBcryptedSafeBounded(passwordHash.value))
       .recover { case e: Exception =>
         logger.error("Failed to validate password", e)
-        throw CryptoException(s"Failed to validate password; e")
+        throw CryptoException(s"Failed to validate password; Error: ${e.getMessage}")
       }
 }
