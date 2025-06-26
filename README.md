@@ -224,10 +224,21 @@ All endpoints are prefixed with `/api`.
 
 ## Testing
 
+To run only IT tests we need `PostgreSQL`:
+
+```bash
+    docker-compose -f docker-compose-test.yml up -d
+```
+
 Run tests using ScalaTest and ScalaCheck:
 
 ```bash
+
+# For Unit tests
 sbt test
+
+# For IT tests
+sbt 'integration/test'
 
 ```
 
