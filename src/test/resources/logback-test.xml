@@ -1,0 +1,8 @@
+<configuration>
+    <appender name="STUB" class="ch.qos.logback.core.helpers.NOPAppender" />
+    <root level="OFF">
+        <appender-ref ref="STUB" />
+    </root>
+    <logger name="com.densungkim.treasurer" level="OFF" />
+    <logger name="akka" level="OFF" />
+</configuration>

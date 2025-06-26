@@ -1,7 +1,6 @@
 package com.densungkim.treasurer.generators
 
 import com.densungkim.treasurer.model.transaction._
-import eu.timepit.refined.types.numeric.PosBigDecimal
 import org.scalacheck.Gen
 
 trait TransactionGenerators extends CommonGenerators {
