@@ -28,5 +28,9 @@ jobs:
       - uses: sbt/setup-sbt@v1
         with:
           sbt-runner-version: 1.11.2
+      - name: Build the Docker image
+        run: docker compose -f docker-compose-test.yml up -d
       - name: Run tests
         run: sbt test
+      - name: Delete the Docker image
+        run: docker compose down
