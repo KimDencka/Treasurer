@@ -9,6 +9,8 @@ import org.scalacheck.Gen
 import scala.concurrent.Future
 
 class TransactionServiceImplSpec extends TestUtils {
+  override def afterAll(): Unit = testExecutor.shutdown()
+
   val mockTransactionRepository: TransactionRepository = mock[TransactionRepository]
   val transactionService: TransactionService           = new TransactionServiceImpl(mockTransactionRepository)
 

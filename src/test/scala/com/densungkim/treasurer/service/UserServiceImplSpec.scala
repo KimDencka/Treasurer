@@ -9,6 +9,8 @@ import org.scalacheck.Gen
 import scala.concurrent.Future
 
 class UserServiceImplSpec extends TestUtils {
+  override def afterAll(): Unit = testExecutor.shutdown()
+
   val mockCryptoService: CryptoService   = mock[CryptoService]
   val mockUserRepository: UserRepository = mock[UserRepository]
   val passwordHash: PasswordHash         = PasswordHash("password-hash")

@@ -13,6 +13,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class AuthServiceImplSpec extends TestUtils {
+  override def afterAll(): Unit = testExecutor.shutdown()
+
   val mockCryptoService: CryptoService   = mock[CryptoService]
   val mockUserRepository: UserRepository = mock[UserRepository]
 
