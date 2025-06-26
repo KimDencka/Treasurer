@@ -43,8 +43,8 @@ final class UserServiceImpl(
       updated      <- repository.update(user).map {
                         case Some(u) => UserResponse(u.id, u.username, u.createdAt)
                         case None    =>
-                          logger.error(s"Update failed unexpectedly for user $id")
-                          throw UserNotFound(s"User with ID $id not found")
+                          logger.error(s"Update failed unexpectedly for user '$id'")
+                          throw UserNotFound(s"User with ID '$id' not found")
                       }
       _             = logger.info(s"User updated: ${updated.username}")
     } yield updated
@@ -53,8 +53,8 @@ final class UserServiceImpl(
     repository.getById(id).map {
       case Some(user) => UserResponse(user.id, user.username, user.createdAt)
       case None       =>
-        logger.warn(s"Get failed: user $id not found")
-        throw UserNotFound(s"User with ID $id not found")
+        logger.warn(s"Get failed: user '$id' not found")
+        throw UserNotFound(s"User with ID '$id' not found")
     }
 
   override def getByUsername(username: String): Future[UserResponse] =
@@ -70,8 +70,8 @@ final class UserServiceImpl(
       case true  =>
         logger.info(s"User deleted: $id")
       case false =>
-        logger.warn(s"Delete failed: user $id not found")
-        throw UserNotFound(s"User with ID $id not found")
+        logger.warn(s"Delete failed: user '$id' not found")
+        throw UserNotFound(s"User with ID '$id' not found")
     }
 
 }
